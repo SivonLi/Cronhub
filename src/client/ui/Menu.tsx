@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { MoreHorizontal } from "./icons";
 import { cx, focusRing } from "./styles";
 
@@ -7,6 +7,8 @@ export type MenuItem = {
   icon?: ReactNode;
   onSelect: () => void;
   tone?: "danger";
+  /** 在该项上方渲染一条分割线（如把「退出登录」与设置项隔开防误触） */
+  separator?: boolean;
 };
 
 type Props = {
@@ -121,24 +123,26 @@ export function Menu({ label, items, trigger, triggerClassName, dropUp = false }
             dropUp ? "bottom-full mb-1" : "mt-1 top-full",
           )}>
           {items.map(it => (
-            <button
-              key={it.label}
-              role="menuitem"
-              type="button"
-              // 先把焦点还给触发按钮再执行回调。菜单项自己会被卸载，不还焦点就掉到 body；
-              // Esc 路径专门做了归还，Enter 选中却没做，两条键盘路径本来不一致。
-              // 顺序不能反：onSelect 可能打开抽屉并抢走焦点，那时归还会把它抢回来。
-              onClick={() => { setOpen(false); triggerRef.current?.focus(); it.onSelect(); }}
-              className={cx(
-                "flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm",
-                "transition-colors duration-fast hover:bg-panel-hover",
-                focusRing,
-                it.tone === "danger" ? "text-danger" : "text-fg",
-              )}
-            >
-              {it.icon}
-              {it.label}
-            </button>
+            <Fragment key={it.label}>
+              {it.separator && <div role="separator" className="my-1 h-px bg-border" />}
+              <button
+                role="menuitem"
+                type="button"
+                // 先把焦点还给触发按钮再执行回调。菜单项自己会被卸载，不还焦点就掉到 body；
+                // Esc 路径专门做了归还，Enter 选中却没做，两条键盘路径本来不一致。
+                // 顺序不能反：onSelect 可能打开抽屉并抢走焦点，那时归还会把它抢回来。
+                onClick={() => { setOpen(false); triggerRef.current?.focus(); it.onSelect(); }}
+                className={cx(
+                  "flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm",
+                  "transition-colors duration-fast hover:bg-panel-hover",
+                  focusRing,
+                  it.tone === "danger" ? "text-danger" : "text-fg",
+                )}
+              >
+                {it.icon}
+                {it.label}
+              </button>
+            </Fragment>
           ))}
         </div>
       )}

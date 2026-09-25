@@ -97,3 +97,16 @@ export type HeartbeatRow = {
   latency_ms: number | null;
   error_message: string | null;
 };
+
+export type ApiTokenRow = {
+  id: number;
+  name: string;
+  /** 明文令牌的 SHA-256 十六进制哈希；校验按哈希查库，库泄露也还原不出明文 */
+  token_hash: string;
+  /** 明文前 10 字符（chb_ 前缀 + 6 位随机字符），列表脱敏展示用 */
+  token_prefix: string;
+  /** 最近一次通过该令牌成功调用 POST /api/trigger 的时间 */
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
+};

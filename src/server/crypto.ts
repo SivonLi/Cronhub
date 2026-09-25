@@ -152,3 +152,17 @@ export async function verifyPasswordHash(stored: string, pw: string): Promise<bo
   for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
   return diff === 0;
 }
+
+// ---- API Token（外部触发调度器）：明文只展示一次，库存 SHA-256 哈希 ----
+
+/** 十六进制 SHA-256。校验按哈希查库而非解密：数据库泄露也还原不出明文令牌。 */
+export async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", te.encode(text));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** 生成 API Token：chb_ 前缀 + 32 随机字节的 base64url（43 字符），总长 47。 */
+export function generateApiToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return `chb_${b64urlEncode(bytes)}`;
+}

@@ -113,6 +113,23 @@ const MIGRATIONS: Migration[] = [
       "ALTER TABLE monitors ADD COLUMN timezone TEXT",
     ],
   },
+  {
+    // 外部触发调度器的 API 令牌：管理后台创建，库存 SHA-256 哈希（不可逆），
+    // 明文仅创建响应返回一次。字段语义见 schema.sql api_tokens 表注释。
+    id: 5,
+    name: "api-tokens",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS api_tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        token_hash TEXT NOT NULL UNIQUE,
+        token_prefix TEXT NOT NULL,
+        last_used_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )`,
+    ],
+  },
 ];
 
 let migrated = false;

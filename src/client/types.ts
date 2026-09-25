@@ -15,6 +15,17 @@ export type Channel = {
   url: string;
 };
 
+/** API 令牌（外部触发调度器用），在「账户 → API 令牌」里管理 */
+export type ApiToken = {
+  id: number;
+  name: string;
+  /** 明文前 10 字符（chb_ 前缀 + 6 位随机字符），列表脱敏展示 */
+  token_prefix: string;
+  /** 最近一次通过该令牌成功触发调度的时间；从未使用为 null */
+  last_used_at: number | null;
+  created_at: number;
+};
+
 /** 渠道类型的中文标签（表单多选列表与渠道管理共用） */
 export const CHANNEL_TYPE_LABEL: Record<Channel["type"], string> = {
   wecom: "企业微信",

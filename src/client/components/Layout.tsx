@@ -4,7 +4,7 @@ import { get, post } from "../api";
 import type { Stats } from "../types";
 import { Menu } from "../ui";
 import {
-  BellRing, ChevronDown, HeartPulse, KeyRound, LayoutDashboard, LogOut, Menu as MenuIcon, ScrollText, Timer, UserRound, Users, X,
+  BellRing, ChevronDown, HeartPulse, KeyRound, LayoutDashboard, LogOut, Menu as MenuIcon, ScrollText, Timer, UserRound, Users, Webhook, X,
   type LucideIcon,
 } from "../ui/icons";
 import { cx, focusRing } from "../ui/styles";
@@ -12,6 +12,7 @@ import { Logo } from "./Logo";
 import NotifyDialog from "./NotifyDialog";
 import PasswordDialog from "./PasswordDialog";
 import ThemeToggle from "./ThemeToggle";
+import TokensDialog from "./TokensDialog";
 
 type Link = {
   to: string; label: string; end: boolean; Icon: LucideIcon;
@@ -66,6 +67,7 @@ export default function Layout() {
   const [open, setOpen] = useState(false);
   const [pwOpen, setPwOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const [tokensOpen, setTokensOpen] = useState(false);
   const drawerRef = useRef<HTMLDialogElement>(null);
 
   // 路由切换就重新拉计数。alive 标记有两个作用：快速连切路由时先发后到的旧响应
@@ -135,8 +137,9 @@ export default function Layout() {
         }
         items={[
           { label: "通知设置", icon: <BellRing className="size-3.5" />, onSelect: () => setNotifyOpen(true) },
+          { label: "API 令牌", icon: <Webhook className="size-3.5" />, onSelect: () => setTokensOpen(true) },
           { label: "修改密码", icon: <KeyRound className="size-3.5" />, onSelect: () => setPwOpen(true) },
-          { label: "退出登录", icon: <LogOut className="size-3.5" />, onSelect: () => void logout(), tone: "danger" },
+          { label: "退出登录", icon: <LogOut className="size-3.5" />, onSelect: () => void logout(), tone: "danger", separator: true },
         ]}
       />
     </div>
@@ -194,6 +197,7 @@ export default function Layout() {
 
       {pwOpen && <PasswordDialog open onClose={() => setPwOpen(false)} />}
       {notifyOpen && <NotifyDialog open onClose={() => setNotifyOpen(false)} />}
+      {tokensOpen && <TokensDialog open onClose={() => setTokensOpen(false)} />}
     </div>
   );
 }

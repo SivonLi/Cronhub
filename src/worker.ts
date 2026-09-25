@@ -8,6 +8,8 @@ import miscRoutes from "./server/routes/misc";
 import passwordRoutes from "./server/routes/password";
 import notifyRoutes from "./server/routes/notify";
 import githubRoutes from "./server/routes/github";
+import tokenRoutes from "./server/routes/tokens";
+import triggerRoutes from "./server/routes/trigger";
 import { requireAuth } from "./server/middleware";
 import { runDueJobs } from "./server/scheduler";
 import { runDueMonitors } from "./server/monitor";
@@ -17,6 +19,8 @@ import type { Env } from "./server/types";
 const app = new Hono<{ Bindings: Env }>();
 
 app.route("/api/auth", authRoutes);
+// 外部触发：令牌自验（requireApiToken），不走管理员会话
+app.route("/api/trigger", triggerRoutes);
 
 const protectedApi = new Hono<{ Bindings: Env }>();
 protectedApi.use("*", requireAuth);
@@ -27,6 +31,7 @@ protectedApi.route("/runs", runRoutes);
 protectedApi.route("/password", passwordRoutes);
 protectedApi.route("/notify", notifyRoutes);
 protectedApi.route("/github", githubRoutes);
+protectedApi.route("/tokens", tokenRoutes);
 protectedApi.route("/", miscRoutes); // /stats 与 /cron/preview
 app.route("/api", protectedApi);
 
