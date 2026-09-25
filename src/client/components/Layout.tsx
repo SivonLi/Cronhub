@@ -11,6 +11,7 @@ import { cx, focusRing } from "../ui/styles";
 import { Logo } from "./Logo";
 import NotifyDialog from "./NotifyDialog";
 import PasswordDialog from "./PasswordDialog";
+import SiteFooter from "./SiteFooter";
 import ThemeToggle from "./ThemeToggle";
 import TokensDialog from "./TokensDialog";
 
@@ -177,7 +178,8 @@ export default function Layout() {
         </div>
       </dialog>
 
-      <div className="lg:pl-64">
+      {/* 全高弹性列：内容不足一屏时页脚仍贴底（mt-auto），超出一屏时随内容顺延 */}
+      <div className="flex min-h-screen flex-col lg:pl-64">
         {/* 窄屏顶部条 */}
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-panel/85 px-4 py-3 backdrop-blur lg:hidden">
           <button type="button" onClick={() => setOpen(true)} aria-label="打开导航" aria-expanded={open}
@@ -190,9 +192,10 @@ export default function Layout() {
         {/* 内容区在侧栏以外的剩余空间里居中（上限 1440px）：完全不限宽会拉伸到
             交互难受，靠左又会右重左轻；居中后 1920 宽下侧栏与内容的间距收敛到
             约 112px 且左右对称，视口再大也是对称留白，观感是「刻意留白」而不是割裂。 */}
-        <main className="mx-auto max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8">
+        <main className="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8">
           <Outlet />
         </main>
+        <div className="mt-auto"><SiteFooter /></div>
       </div>
 
       {pwOpen && <PasswordDialog open onClose={() => setPwOpen(false)} />}

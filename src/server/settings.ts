@@ -63,6 +63,34 @@ export async function getAutoPauseThreshold(env: Env): Promise<number> {
   }
 }
 
+// ---- 公开状态页（单页）：配置 JSON 存 settings，损坏按未启用处理 ----
+
+export const KEY_STATUS_PAGE = "status_page";
+
+export type StatusPageConfig = {
+  /** 1 = 对外开放 */
+  enabled: number;
+  slug: string;
+  title: string;
+  monitor_ids: number[];
+};
+
+export async function getStatusPage(env: Env): Promise<StatusPageConfig | null> {
+  const raw = await getSetting(env, KEY_STATUS_PAGE);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as StatusPageConfig;
+    if (!parsed || typeof parsed.slug !== "string" || !Array.isArray(parsed.monitor_ids)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export async function setStatusPage(env: Env, config: StatusPageConfig): Promise<void> {
+  await setSetting(env, KEY_STATUS_PAGE, JSON.stringify(config));
+}
+
 export function invalidateAuthState(): void {
   cache = null;
 }

@@ -5,12 +5,9 @@ import { runDueJobs, type WaitUntilHost } from "../scheduler";
 import { runDueMonitors } from "../monitor";
 import type { ApiTokenRow, Env } from "../types";
 
-/** 外部触发令牌校验：Authorization: Bearer <token> → SHA-256 哈希查库。
- * 命中后顺手更新 last_used_at（一次轻量写，「账户 → API 令牌」列表据此展示
- * 令牌是否仍在使用）。
- * 认证前先按 IP 限流：无令牌的洪水请求虽然每次只消耗一次哈希查库，但持续刷
- * 会烧 D1 读数配额——按 IP 压到 5 次/分（与登录失败的限流同一个 binding，
- * key 加 trigger: 前缀独立计数，不与登录挤占同一份额度）。 */
+/** 外部触发令牌校验：Bearer 令牌 → SHA-256 哈希查库，命中后更新 last_used_at。
+ * 认证前先按 IP 限流：无令牌洪水也会烧 D1 读数配额，按 IP 压到 5 次/分
+ * （key 加 trigger: 前缀，与登录限流独立计数）。 */
 export const requireApiToken = createMiddleware<{ Bindings: Env }>(async (c, next) => {
   const rl = c.env.RATE_LIMITER;
   if (rl) {

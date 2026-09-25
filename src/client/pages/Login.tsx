@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { errText, post } from "../api";
 import { Logo } from "../components/Logo";
+import SiteFooter from "../components/SiteFooter";
 import ThemeToggle from "../components/ThemeToggle";
 import { Button, Field, Input } from "../ui";
 
@@ -59,6 +60,8 @@ export default function Login() {
           </div>
         </form>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }

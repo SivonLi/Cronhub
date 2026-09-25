@@ -3,7 +3,7 @@ import { Activity, LoaderCircle, Pencil, Play, Trash2 } from "../../ui/icons";
 import { cx } from "../../ui/styles";
 import type { Heartbeat, Monitor } from "../../types";
 import { relativeTime } from "../../utils/time";
-import HeartbeatBar from "./HeartbeatBar";
+import HeartbeatBar from "../../ui/HeartbeatBar";
 import { statusBadge } from "./shared";
 
 type Props = {

@@ -5,7 +5,7 @@ import type { Heartbeat, Monitor, MonitorStats } from "../../types";
 import { Badge, Button, Drawer, Skeleton, useConfirm } from "../../ui";
 import { RefreshCw, Trash2 } from "../../ui/icons";
 import { fmtTime, relativeTime } from "../../utils/time";
-import HeartbeatBar from "./HeartbeatBar";
+import HeartbeatBar from "../../ui/HeartbeatBar";
 
 type Props = {
   monitor: Monitor;

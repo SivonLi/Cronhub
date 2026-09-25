@@ -1,10 +1,17 @@
-import { cx } from "../../ui/styles";
-import { fmtTime } from "../../utils/time";
-import type { Heartbeat } from "../../types";
+import { cx } from "./styles";
+import { fmtTime } from "../utils/time";
+import type { Heartbeat } from "../types";
 
 type Props = {
-  /** 旧→新排序的心跳数组；不足 slots 时左侧补空格 */
-  beats: Heartbeat[];
+  /** 旧→新排序的心跳；不足 slots 时左侧补空格。只需 created_at/status（公开页数据经裁剪后无 id） */
+  beats: Array<{
+    id?: number;
+    created_at: number;
+    status: "up" | "down";
+    http_status?: number | null;
+    latency_ms?: number | null;
+    error_message?: string | null;
+  }>;
   /** 条带格数 */
   slots?: number;
   /** 条带整体高度（Tailwind 类） */
@@ -21,8 +28,7 @@ export default function HeartbeatBar({ beats, slots = 40, size = "sm", className
   const pad = Math.max(0, slots - beats.length);
   const shown = beats.slice(-slots);
   return (
-    // 条带点击是鼠标便利（打开详情），容器保持 role="img"，键盘/读屏走
-    // 卡片/行操作区真正的「查看详情」按钮。
+    // 条带点击只是鼠标便利；容器保持 role="img"，键盘走卡片/行的「查看详情」按钮。
     <div
       onClick={onClick}
       className={cx("flex w-full gap-[2px]", onClick && "cursor-pointer", className)}
@@ -30,16 +36,16 @@ export default function HeartbeatBar({ beats, slots = 40, size = "sm", className
       aria-label={`最近 ${shown.length} 次探测，${shown.filter(b => b.status === "up").length} 次成功`}
     >
       {Array.from({ length: pad }, (_, i) => (
-        // 空位预填充：淡灰底让条带在刚开始记录时也显得完整（零数据时整条可见）
+        // 空位淡灰预填充，零数据时整条也可见
         <div key={`pad-${i}`}
           className={cx("min-w-0 flex-1 rounded-[2px] bg-border/60", size === "sm" ? "h-5" : "h-8")} />
       ))}
-      {shown.map(b => (
+      {shown.map((b, i) => (
         <div
-          key={b.id}
+          key={b.id ?? i}
           title={beatTitle(b)}
           className={cx(
-            "min-w-0 flex-1 rounded-[2px] transition-transform duration-fast ease-smooth hover:scale-125",
+            "min-w-0 flex-1 cursor-pointer rounded-[2px] transition-transform duration-fast ease-smooth hover:scale-125",
             size === "sm" ? "h-5" : "h-8",
             b.status === "up" ? "bg-success" : "bg-danger",
           )}
@@ -49,7 +55,13 @@ export default function HeartbeatBar({ beats, slots = 40, size = "sm", className
   );
 }
 
-function beatTitle(b: Heartbeat): string {
+function beatTitle(b: {
+  created_at: number;
+  status: "up" | "down";
+  http_status?: number | null;
+  latency_ms?: number | null;
+  error_message?: string | null;
+}): string {
   const head = `${fmtTime(b.created_at)} · ${b.status === "up" ? "成功" : "失败"}`;
   if (b.status === "up") {
     return `${head} · HTTP ${b.http_status ?? "-"} · ${b.latency_ms ?? "-"}ms`;

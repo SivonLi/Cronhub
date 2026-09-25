@@ -2,7 +2,7 @@ import { Badge, Card, Switch, iconActionDanger, iconActionInfo, iconActionSucces
 import { Activity, Globe, LoaderCircle, Pencil, Play, Timer, Trash2 } from "../../ui/icons";
 import type { Heartbeat, Monitor } from "../../types";
 import { relativeTime } from "../../utils/time";
-import HeartbeatBar from "./HeartbeatBar";
+import HeartbeatBar from "../../ui/HeartbeatBar";
 import { statusBadge } from "./shared";
 
 type Props = {

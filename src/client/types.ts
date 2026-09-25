@@ -189,3 +189,27 @@ export type Stats = {
   /** 调度器最近一轮活动时间；从未运行过为 null */
   scheduler_last_run_at: number | null;
 };
+
+/** 公开状态页配置（管理端读写，单页） */
+export type StatusPageConfig = {
+  enabled: number;
+  slug: string;
+  title: string;
+  monitor_ids: number[];
+};
+
+/** 公开状态页数据（访客视角；服务端已裁剪——无地址/错误详情/延迟明细） */
+export type StatusPageData = {
+  title: string;
+  /** 有 down 监控即 down */
+  overall: "up" | "down";
+  monitors: Array<{
+    id: number;
+    name: string;
+    status: "up" | "down" | "pending";
+    uptime_24h: number | null;
+    uptime_7d: number | null;
+    avg_latency_24h: number | null;
+    beats: Array<{ created_at: number; status: "up" | "down" }>;
+  }>;
+};

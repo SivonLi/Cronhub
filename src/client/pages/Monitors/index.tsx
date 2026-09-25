@@ -5,7 +5,7 @@ import PageHeader from "../../components/PageHeader";
 import { useToast } from "../../components/Toast";
 import type { Channel, Heartbeat, Job, Monitor, ProbeOutcome } from "../../types";
 import { Button, EmptyState, Segmented, Skeleton, SkeletonCard, useConfirm } from "../../ui";
-import { Inbox, Plus, Trash2 } from "../../ui/icons";
+import { Globe, Inbox, Plus, Trash2 } from "../../ui/icons";
 import { cx } from "../../ui/styles";
 import { useAlive } from "../../utils/useAlive";
 import { useAutoRefresh } from "../../utils/useAutoRefresh";
@@ -15,6 +15,7 @@ import MonitorForm, { EMPTY_FORM, type MonitorFormData } from "./MonitorForm";
 import { LOCAL_TZ } from "../Jobs/schedule";
 import MonitorRow from "./MonitorRow";
 import MonitorsCleanupDialog from "./MonitorsCleanupDialog";
+import StatusPageDialog from "../../components/StatusPageDialog";
 
 type Filter = "" | "up" | "down" | "paused";
 type ViewMode = "card" | "list";
@@ -61,6 +62,7 @@ export default function Monitors() {
   const [view, setView] = useState<ViewMode>(loadView);
   const [retention, setRetention] = useState(30);
   const [cleanupOpen, setCleanupOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
   // 筛选状态同步进 URL（?status=down）：仪表盘监控卡的副行可直达故障筛选
   const [params, setParams] = useSearchParams();
   const rawFilter = params.get("status") ?? "";
@@ -219,6 +221,9 @@ export default function Monitors() {
         description="周期性探测外部地址，离线推送告警，并可联动触发任务自动恢复。"
         action={
           <div className="flex items-center gap-2">
+            <Button variant="secondary" icon={<Globe className="size-4" />} onClick={() => setStatusOpen(true)}>
+              状态页
+            </Button>
             <Button variant="secondary" icon={<Trash2 className="size-4" />} onClick={() => setCleanupOpen(true)}>
               清理心跳
             </Button>
@@ -321,6 +326,8 @@ export default function Monitors() {
         onRetentionChanged={setRetention}
         onCleaned={() => void load().catch(() => {})}
       />
+
+      {statusOpen && <StatusPageDialog open onClose={() => setStatusOpen(false)} />}
     </div>
   );
 }

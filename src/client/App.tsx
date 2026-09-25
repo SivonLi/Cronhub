@@ -9,6 +9,7 @@ import Jobs from "./pages/Jobs";
 import Monitors from "./pages/Monitors";
 import Accounts from "./pages/Accounts";
 import Runs from "./pages/Runs";
+import StatusPage from "./pages/StatusPage";
 
 export default function App() {
   return (
@@ -16,6 +17,8 @@ export default function App() {
       <ConfirmProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          {/* 公开状态页：免登录，独立渲染（不套 Layout/RequireAuth） */}
+          <Route path="/status/:slug" element={<StatusPage />} />
           <Route element={<RequireAuth><Layout /></RequireAuth>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/jobs" element={<Jobs />} />

@@ -11,11 +11,7 @@ type Props = { open: boolean; onClose: () => void };
 /** 创建成功后的临时态：明文令牌只在这里展示这一次 */
 type CreatedToken = { id: number; name: string; token: string };
 
-/**
- * API 令牌管理：外部系统持令牌调用 POST /api/trigger 触发一轮调度
- * （到期任务 + 到期监控探测），用于替代或补充平台 cron。
- * 明文只在创建响应里出现一次，列表永远只有脱敏前缀。
- */
+/** API 令牌管理：供外部系统调用 POST /api/trigger。明文只在创建时展示一次，列表仅脱敏前缀。 */
 export default function TokensDialog({ open, onClose }: Props) {
   const toast = useToast();
   const confirm = useConfirm();
