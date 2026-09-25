@@ -116,7 +116,7 @@ export async function runDueJobs(env: Env, now: number = Date.now(), ctx?: WaitU
       const v = validateSchedule(JSON.parse(job.schedule_json));
       if (!v.ok) return; // 调度规则损坏：跳过（不发触发，也不推进时间）
       // 基于原计划时间累加，避免累积漂移；若算出的时间仍在过去（停机/漏跑积压），
-      // 从 now 重算快进：本轮立即补发这一次，之后恢复正常节奏，而不是每 5 分钟
+      // 从 now 重算快进：本轮立即补发这一次，之后恢复正常节奏，而不是每分钟
       // 一轮逐个补发积压的每一次（补偿式连发）。
       let newNext = computeNextRun(v.rule, job.next_run_at, Math.random, job.timezone ?? undefined);
       if (newNext <= now) newNext = computeNextRun(v.rule, now, Math.random, job.timezone ?? undefined);
@@ -183,7 +183,7 @@ export async function runDueJobs(env: Env, now: number = Date.now(), ctx?: WaitU
       // 抛错发生在乐观锁 claim 之前时 next_run_at 未推进，任务会每周期重复
       // "到期→重抛"，形成热循环。这里用 now+30min 兜底推进（复用乐观锁，
       // 若已推进过则不匹配、无副作用），让损坏任务降温到每 30 分钟重试一次，
-      // 而不是每 5 分钟瘫痪式重抛。
+      // 而不是每分钟瘫痪式重抛。
       try {
         await env.DB.prepare(
           "UPDATE jobs SET next_run_at=?, updated_at=? WHERE id=? AND next_run_at=? AND enabled=1",

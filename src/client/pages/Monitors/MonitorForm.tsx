@@ -105,7 +105,7 @@ function validate(f: MonitorFormData): Record<Key, string | null> {
     name: f.name.trim() ? null : "监控名不能为空",
     url: validateUrl(f.url),
     timeout_sec: intIn(f.timeout_sec, 1, 30),
-    interval_min: intIn(f.interval_min, 2, 1440),
+    interval_min: intIn(f.interval_min, 1, 1440),
     fail_threshold: intIn(f.fail_threshold, 1, 10),
     headers_json: validateHeadersJson(f.headers_json),
     expected_status: validateCodes(f.expected_status),
@@ -215,10 +215,10 @@ export default function MonitorForm({
                   onChange={e => set({ timeout_sec: Number(e.target.value) })} />
               )}
             </Field>
-            <Field label="间隔（分钟）" hint="平台每 2 分钟唤醒" error={err("interval_min")}>
+            <Field label="间隔（分钟）" hint="平台每分钟唤醒" error={err("interval_min")}>
               {({ id, describedBy }) => (
                 <Input id={id} aria-describedby={describedBy} invalid={!!err("interval_min")}
-                  type="number" min={2} max={1440} value={form.interval_min} onBlur={touch("interval_min")}
+                  type="number" min={1} max={1440} value={form.interval_min} onBlur={touch("interval_min")}
                   onChange={e => set({ interval_min: Number(e.target.value) })} />
               )}
             </Field>

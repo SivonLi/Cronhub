@@ -108,8 +108,8 @@ function validateMonitorBody(body: Record<string, unknown>): { ok: true; data: M
   const interval_seconds = body.interval_seconds === undefined || body.interval_seconds === null || body.interval_seconds === ""
     ? 300
     : Number(body.interval_seconds);
-  if (!Number.isInteger(interval_seconds) || interval_seconds < 120 || interval_seconds > 86400) {
-    return { ok: false, error: "检测间隔应为 2-1440 分钟（平台每 2 分钟唤醒一次）" };
+  if (!Number.isInteger(interval_seconds) || interval_seconds < 60 || interval_seconds > 86400) {
+    return { ok: false, error: "检测间隔应为 1-1440 分钟（平台每分钟唤醒一次）" };
   }
 
   const fail_threshold = body.fail_threshold === undefined || body.fail_threshold === null || body.fail_threshold === ""

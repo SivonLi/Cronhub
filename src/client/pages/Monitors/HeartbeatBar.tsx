@@ -10,26 +10,36 @@ type Props = {
   /** 条带整体高度（Tailwind 类） */
   size?: "sm" | "lg";
   className?: string;
+  /** 传入后整条可点（列表用它打开详情抽屉）；详情抽屉内的条带不传 */
+  onClick?: () => void;
 };
 
 /** 心跳条带：每格一次探测，绿=成功 红=失败 灰=暂无数据，
  * 原生 title 提示详情。纯 div 实现，无图表库依赖。 */
-export default function HeartbeatBar({ beats, slots = 40, size = "sm", className }: Props) {
+export default function HeartbeatBar({ beats, slots = 40, size = "sm", className, onClick }: Props) {
   // 不足补位放在左侧：右侧对齐最新的探测，与时间轴方向一致
   const pad = Math.max(0, slots - beats.length);
   const shown = beats.slice(-slots);
   return (
-    <div className={cx("flex w-full gap-[2px]", className)} role="img"
-      aria-label={`最近 ${shown.length} 次探测，${shown.filter(b => b.status === "up").length} 次成功`}>
+    // 条带点击是鼠标便利（打开详情），容器保持 role="img"，键盘/读屏走
+    // 卡片/行操作区真正的「查看详情」按钮。
+    <div
+      onClick={onClick}
+      className={cx("flex w-full gap-[2px]", onClick && "cursor-pointer", className)}
+      role="img"
+      aria-label={`最近 ${shown.length} 次探测，${shown.filter(b => b.status === "up").length} 次成功`}
+    >
       {Array.from({ length: pad }, (_, i) => (
-        <div key={`pad-${i}`} className="min-w-0 flex-1" />
+        // 空位预填充：淡灰底让条带在刚开始记录时也显得完整（零数据时整条可见）
+        <div key={`pad-${i}`}
+          className={cx("min-w-0 flex-1 rounded-[2px] bg-border/60", size === "sm" ? "h-5" : "h-8")} />
       ))}
       {shown.map(b => (
         <div
           key={b.id}
           title={beatTitle(b)}
           className={cx(
-            "min-w-0 flex-1 rounded-[2px]",
+            "min-w-0 flex-1 rounded-[2px] transition-transform duration-fast ease-smooth hover:scale-125",
             size === "sm" ? "h-5" : "h-8",
             b.status === "up" ? "bg-success" : "bg-danger",
           )}

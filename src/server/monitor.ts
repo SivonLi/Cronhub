@@ -404,7 +404,7 @@ export async function runDueMonitors(
   if (ctx) ctx.waitUntil(tail);
   else await tail;
 
-  // 心跳保留期清理：每监控每天最多 720 条（2 分钟粒度），默认 30 天。清理失败
+  // 心跳保留期清理：每监控每天最多 1440 条（1 分钟粒度），默认 30 天。清理失败
   // 不影响本轮探测结果，下个周期会再试。
   try {
     const configured = Number(await getSetting(env, KEY_HEARTBEATS_RETENTION));
