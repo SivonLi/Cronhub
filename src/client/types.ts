@@ -210,6 +210,6 @@ export type StatusPageData = {
     uptime_24h: number | null;
     uptime_7d: number | null;
     avg_latency_24h: number | null;
-    beats: Array<{ created_at: number; status: "up" | "down" }>;
+    beats: Array<{ created_at: number; status: "up" | "down"; http_status: number | null; latency_ms: number | null }>;
   }>;
 };

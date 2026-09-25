@@ -7,7 +7,8 @@ const statusRoutes = new Hono<{ Bindings: Env }>();
 const DAY = 24 * 3600 * 1000;
 const BEATS = 40;
 
-// 公开状态页数据：只暴露配置选中的启用中监控，地址/错误详情/延迟明细在服务端裁剪。
+// 公开状态页数据：只暴露配置选中的启用中监控，地址/错误详情在服务端裁剪
+// （心跳保留状态码与耗时供悬停展示，error_message 不出库）。
 statusRoutes.get("/:slug", async (c) => {
   const cfg = await getStatusPage(c.env);
   const slug = c.req.param("slug");
@@ -36,7 +37,7 @@ statusRoutes.get("/:slug", async (c) => {
           "SELECT id, created_at, status, http_status, latency_ms, error_message FROM heartbeats WHERE monitor_id=? ORDER BY created_at DESC, id DESC LIMIT ?",
         )
           .bind(id, BEATS)
-          .all<{ created_at: number; status: string }>(),
+          .all<{ created_at: number; status: string; http_status: number | null; latency_ms: number | null }>(),
       ]);
       const s = stats ?? {};
       const pct = (t: unknown, u: unknown) => (Number(t) > 0 ? Math.round((Number(u) / Number(t)) * 100) : null);
@@ -49,7 +50,12 @@ statusRoutes.get("/:slug", async (c) => {
         avg_latency_24h: s.avg_latency_24h ?? null,
         beats: (beatsRows.results ?? [])
           .reverse()
-          .map((b) => ({ created_at: b.created_at, status: b.status as "up" | "down" })),
+          .map((b) => ({
+            created_at: b.created_at,
+            status: b.status as "up" | "down",
+            http_status: b.http_status,
+            latency_ms: b.latency_ms,
+          })),
       };
     }),
   )).filter((m): m is NonNullable<typeof m> => m !== null);
