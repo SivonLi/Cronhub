@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { errText, get } from "../../api";
 import type { Schedule } from "../../types";
 import { Input, Segmented, Select, cx } from "../../ui";
+import { TimezoneSelect } from "../../ui/TimezoneSelect";
 import { fmtTimeTz, relativeTime } from "../../utils/time";
 import { EMPTY_SCHEDULE, timezoneOptions } from "./schedule";
 
@@ -76,7 +77,7 @@ export default function ScheduleEditor({ value, onChange, timezone, onTimezoneCh
         // 的连体样式同构（一根边框、发丝分隔线、focus-within 整体强调）。
         // 「时区」为纯视觉标注（aria-hidden），读屏走下拉自身的 aria-label。
         <div className={cx(
-          "flex items-stretch overflow-hidden rounded-lg border border-border bg-panel",
+          "relative flex items-stretch rounded-lg border border-border bg-panel",
           "transition-colors duration-fast ease-smooth",
           "focus-within:border-fg/60 focus-within:ring-2 focus-within:ring-fg/12",
         )}>
@@ -93,14 +94,8 @@ export default function ScheduleEditor({ value, onChange, timezone, onTimezoneCh
             <span aria-hidden className="shrink-0 whitespace-nowrap pl-2.5 pr-1 text-xs text-fg-subtle">
               Tz
             </span>
-            <div className="min-w-0 flex-1">
-              <Select bare aria-label="生效时区" className="truncate" value={timezone || "UTC"}
-                onChange={e => onTimezoneChange(e.target.value)}>
-                {timezoneOptions(timezone).map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </Select>
-            </div>
+            <TimezoneSelect label="生效时区" value={timezone || "UTC"}
+              options={timezoneOptions(timezone)} onChange={onTimezoneChange} />
           </div>
         </div>
       ) : (

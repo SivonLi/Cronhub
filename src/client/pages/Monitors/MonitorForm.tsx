@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { LOCAL_TZ, timezoneOptions } from "../Jobs/schedule";
 import { CHANNEL_TYPE_LABEL, type Channel, type Job } from "../../types";
-import { Badge, Button, Checkbox, Drawer, Field, Input, Segmented, Select, Switch, Textarea } from "../../ui";
+import { Badge, Button, Checkbox, cx, Drawer, Field, Input, Segmented, Select, Switch, Textarea } from "../../ui";
 
 export type MonitorFormData = {
   id?: number;
@@ -232,24 +232,40 @@ export default function MonitorForm({
           </div>
           <Field label="暂停时段（可选）" hint="窗口内跳过探测，不产生心跳与告警；支持跨天（如 22:00 至 06:00）" error={err("pause")}>
             {({ id }) => (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Select id={id} className="w-28" value={form.pause_start}
-                    onChange={e => set({ pause_start: e.target.value })}>
-                    <option value="">不暂停</option>
-                    {TIME_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                  </Select>
-                  <span className="text-xs text-fg-subtle">至</span>
-                  <Select className="w-28" aria-label="暂停结束时间" value={form.pause_end}
-                    onChange={e => set({ pause_end: e.target.value })}>
-                    <option value="">不暂停</option>
-                    {TIME_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                  </Select>
-                  <span className="ml-auto text-xs text-fg-subtle">时区</span>
-                  <Select className="w-48" aria-label="暂停时段时区" value={form.timezone}
-                    onChange={e => set({ timezone: e.target.value })}>
-                    {timezoneOptions().map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </Select>
+              <div className={cx(
+                "rounded-xl border border-border bg-surface p-3",
+              )}>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2">
+                  <div className="min-w-0">
+                    <span className="mb-1 block text-xs text-fg-subtle">开始</span>
+                    <div className="rounded-lg border border-border bg-panel transition-colors duration-fast focus-within:border-fg/60 focus-within:ring-2 focus-within:ring-fg/12">
+                      <Select id={id} bare value={form.pause_start}
+                        onChange={e => set({ pause_start: e.target.value })}>
+                        <option value="">不暂停</option>
+                        {TIME_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </Select>
+                    </div>
+                  </div>
+                  <span className="pb-2 text-xs text-fg-subtle">至</span>
+                  <div className="min-w-0">
+                    <span className="mb-1 block text-xs text-fg-subtle">结束</span>
+                    <div className="rounded-lg border border-border bg-panel transition-colors duration-fast focus-within:border-fg/60 focus-within:ring-2 focus-within:ring-fg/12">
+                      <Select bare aria-label="暂停结束时间" value={form.pause_end}
+                        onChange={e => set({ pause_end: e.target.value })}>
+                        <option value="">不暂停</option>
+                        {TIME_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 border-t border-border/70 pt-3">
+                  <label className="mb-1 block text-xs text-fg-subtle" htmlFor={`${id}-timezone`}>时区</label>
+                  <div className="rounded-lg border border-border bg-panel transition-colors duration-fast focus-within:border-fg/60 focus-within:ring-2 focus-within:ring-fg/12">
+                    <Select id={`${id}-timezone`} bare aria-label="暂停时段时区" value={form.timezone}
+                      onChange={e => set({ timezone: e.target.value })}>
+                      {timezoneOptions().map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </Select>
+                  </div>
                 </div>
               </div>
             )}
