@@ -14,6 +14,28 @@ const STATUS_FILTERS: Record<string, string> = {
   unknown: "(r.status='success' AND r.gh_state='unknown')",
 };
 
+/** Dashboard preview: one newest run per task, ordered by its latest trigger time. */
+runRoutes.get("/latest-by-job", async (c) => {
+  const rows = await c.env.DB.prepare(
+    `WITH ranked_runs AS (
+       SELECT r.*, ROW_NUMBER() OVER (
+         PARTITION BY r.job_id ORDER BY r.triggered_at DESC, r.id DESC
+       ) AS row_num
+       FROM runs r
+     )
+     SELECT latest.id, latest.job_id, latest.triggered_at, latest.source,
+       latest.status, latest.http_status, latest.error_message, latest.gh_run_id,
+       latest.gh_state, latest.gh_conclusion, latest.gh_run_url,
+       latest.gh_completed_at, j.name AS job_name
+     FROM ranked_runs latest
+     LEFT JOIN jobs j ON j.id=latest.job_id
+     WHERE latest.row_num=1
+     ORDER BY latest.triggered_at DESC, latest.id DESC
+     LIMIT 10`,
+  ).all();
+  return c.json({ ok: true, data: { rows: rows.results ?? [] } });
+});
+
 runRoutes.get("/", async (c) => {
   const jobId = Number(c.req.query("job_id") ?? 0);
   const page = Math.max(1, Number(c.req.query("page") ?? 1) || 1);

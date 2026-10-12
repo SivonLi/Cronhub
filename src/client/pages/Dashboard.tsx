@@ -84,8 +84,8 @@ export default function Dashboard() {
     get<Stats>("/api/stats")
       .then(s => { if (alive.current) setStats(s); })
       .catch(() => { if (alive.current) setStatsError(true); });
-    get<{ rows: Run[] }>("/api/runs?page=1")
-      .then(d => { if (alive.current) setRuns(d.rows.slice(0, 10)); })
+    get<{ rows: Run[] }>("/api/runs/latest-by-job")
+      .then(d => { if (alive.current) setRuns(d.rows); })
       .catch(() => { if (alive.current) setRunsError(true); });
     get<Job[]>("/api/jobs")
       .then(d => { if (alive.current) setJobs(d); })
@@ -199,7 +199,7 @@ export default function Dashboard() {
               <EmptyState
                 icon={<Inbox className="size-6" />}
                 title="暂无运行记录"
-                description="任务第一次触发之后，这里会显示最近 10 条。"
+                description="每个任务只显示最近一次运行记录。"
               />
             </Card>
           ) : (
