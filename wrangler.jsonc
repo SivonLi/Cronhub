@@ -2,6 +2,7 @@
   "name": "cronjob",
   "main": "src/worker.ts",
   "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["global_fetch_strictly_public"],
   // SchedulerAlarm 每分钟自动唤醒，任务时间由 Cronhub 数据库中的规则决定。
   "triggers": { "crons": [] },
   "durable_objects": {
