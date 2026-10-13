@@ -2,10 +2,14 @@
   "name": "cronjob",
   "main": "src/worker.ts",
   "compatibility_date": "2026-08-01",
-  // 平台定时调度触发器。免费计划的 Cron 触发器配额共 5 个：若配额已满导致
-  // 部署失败，删除整个 triggers 块再部署，改用「账户 → API 令牌」的外部触发
-  // 接口驱动调度（POST /api/trigger，见 README「外部触发与调度来源」）。
-  "triggers": { "crons": ["* * * * *"] },
+  // SchedulerAlarm 每分钟自动唤醒，任务时间由 Cronhub 数据库中的规则决定。
+  "triggers": { "crons": [] },
+  "durable_objects": {
+    "bindings": [{ "name": "SCHEDULER", "class_name": "SchedulerAlarm" }]
+  },
+  "exports": {
+    "SchedulerAlarm": { "type": "durable-object", "storage": "sqlite" }
+  },
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",

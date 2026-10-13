@@ -1,3 +1,5 @@
+import type { SchedulerAlarm } from "../worker";
+
 /** Workers Ratelimit binding（wrangler.jsonc ratelimits）。测试环境可不注入。 */
 type RateLimiterBinding = {
   limit(key: { key: string }): Promise<{ success: boolean }>;
@@ -8,6 +10,7 @@ export type Env = {
   ASSETS: Fetcher;
   ADMIN_PASSWORD: string;
   TOKEN_ENC_KEY: string;
+  SCHEDULER: DurableObjectNamespace<SchedulerAlarm>;
   RATE_LIMITER?: RateLimiterBinding;
 };
 

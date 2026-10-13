@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { DurableObject } from "cloudflare:workers";
 import authRoutes from "./server/routes/auth";
 import accountRoutes from "./server/routes/accounts";
 import jobRoutes from "./server/routes/jobs";
@@ -43,12 +44,31 @@ app.route("/api", protectedApi);
 app.all("/api/*", (c) => c.json({ ok: false, error: "Not Found" }, 404));
 app.all("*", (c) => c.env.ASSETS.fetch(c.req.raw));
 
+function nextSchedulerWake(now: number): number {
+  return (Math.floor(now / 60_000) + 1) * 60_000;
+}
+
+export class SchedulerAlarm extends DurableObject<Env> {
+  async start(): Promise<void> {
+    if ((await this.ctx.storage.getAlarm()) === null) {
+      await this.ctx.storage.setAlarm(nextSchedulerWake(Date.now()));
+    }
+  }
+
+  async alarm(): Promise<void> {
+    const now = Date.now();
+    // 保存下一次唤醒后执行调度，任务失败时仍会继续按分钟执行。
+    await this.ctx.storage.setAlarm(nextSchedulerWake(now));
+    await ensureMigrated(this.env);
+    await runDueJobs(this.env, now, this.ctx);
+    await runDueMonitors(this.env, now, this.ctx);
+  }
+}
+
 export default {
-  fetch: (req: Request, env: Env, ctx: ExecutionContext) =>
-    ensureMigrated(env).then(() => app.fetch(req, env, ctx)),
-  scheduled: async (_event: ScheduledController, env: Env, ctx: ExecutionContext) => {
+  fetch: async (req: Request, env: Env, ctx: ExecutionContext) => {
     await ensureMigrated(env);
-    await runDueJobs(env, Date.now(), ctx);
-    await runDueMonitors(env, Date.now(), ctx);
+    await env.SCHEDULER.getByName("cronhub").start();
+    return app.fetch(req, env, ctx);
   },
 } satisfies ExportedHandler<Env>;

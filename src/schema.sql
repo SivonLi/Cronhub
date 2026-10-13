@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 --                     缺省 200-299（任意 2xx）；旧数值 0 同此、N 视为单码。
 --   keyword           响应体包含判定（子串匹配），仅 GET 有意义；NULL = 不检查。
 --   headers_json      自定义请求头 JSON 对象，合并覆盖默认头（默认浏览器 UA，模拟真实访问）。
---   interval_seconds  最小 60：平台 Cron 每分钟唤醒一次。
+--   interval_seconds  最小 60：平台 Alarm 每分钟唤醒一次。
 --   notify / notify_channel_ids  状态变化推送开关与渠道多选，约定同 jobs（NULL = 全部渠道）。
 --   fail_threshold    连续失败 N 次才判 down（防抖）；状态转换的当轮才触发通知与任务联动。
 --   on_down_job_id / on_up_job_id  down / up 状态转换时各触发一次指定任务（自动恢复场景），空 = 不联动。
